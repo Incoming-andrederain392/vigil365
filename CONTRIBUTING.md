@@ -1,0 +1,32 @@
+# Contributing to Vigil365
+
+Thank you for your interest in contributing! This project is built and maintained by an IT professional to help other M365 admins. All skill levels are welcome.
+
+## How to Contribute
+
+### Report a Bug
+1. Go to [Issues](https://github.com/sameerk27/vigil365/issues)
+2. Click **New Issue** → **Bug Report**
+3. Describe what happened and what you expected
+
+### Suggest a Feature
+1. Go to [Issues](https://github.com/sameerk27/vigil365/issues)
+2. Click **New Issue** → **Feature Request**
+3. Describe what you'd like to see and why it would help M365 admins
+
+### Submit a Code Change
+1. Fork the repo
+2. Make your changes
+3. Make sure the app builds without errors (`npm run build` in the client folder)
+4. Open a Pull Request — describe what you changed and why
+
+## Rules
+
+- **No credentials** — never commit real Tenant IDs, Client IDs, or secrets
+- `appsettings.json` must keep placeholder values (`YOUR_TENANT_ID` etc.)
+- No new npm packages without discussion in an Issue first
+- Keep it focused on M365 / Microsoft Graph — out of scope: other cloud providers
+
+## Questions?
+
+Open an [Issue](https://github.com/sameerk27/vigil365/issues) and ask — no question is too basic.
