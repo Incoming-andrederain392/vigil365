@@ -3956,11 +3956,16 @@ function Sidebar({ page, setPage, alertCounts, collapsed, onToggleCollapse }: {
   return (
     <aside className={`sidebar ${collapsed ? "" : "expanded"}`}>
       <div className="sb-logo">
-        <div className="sb-mark"><Shield size={20}/></div>
+        <div className="sb-mark">
+          <svg width="22" height="22" viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M11 2L3 5.5V11C3 15.1 6.4 18.9 11 20C15.6 18.9 19 15.1 19 11V5.5L11 2Z" fill="#3b82f6" stroke="#60a5fa" strokeWidth="0.8"/>
+            <path d="M5.5 11.5 L7.5 11.5 L9 9 L11 14 L13 10 L14.5 11.5 L16.5 11.5" stroke="white" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+          </svg>
+        </div>
         {!collapsed && (
           <div>
-            <div className="sb-name">M365 Security</div>
-            <div className="sb-sub">Security Posture</div>
+            <div className="sb-name">Vigil365</div>
+            <div className="sb-sub">M365 Security Operations</div>
           </div>
         )}
       </div>
@@ -4206,7 +4211,7 @@ function App() {
           <div>
             <h1 className="hdr-title">{currentNav?.label??"Overview"}</h1>
             <p className="hdr-sub">
-              Microsoft 365 Security Dashboard · Updated {lastRefresh.toLocaleTimeString()}
+              Vigil365 · M365 Security Operations · Updated {lastRefresh.toLocaleTimeString()}
               {" · "}<span className="countdown-chip"><Clock size={10}/>Next refresh {fmtCountdown(countdown)}</span>
             </p>
           </div>
