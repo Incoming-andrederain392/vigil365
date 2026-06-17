@@ -4,7 +4,8 @@ A self-hosted, real-time Microsoft 365 security monitoring dashboard that aggreg
 
 > **No third-party SaaS required.** Runs entirely on your own Windows host using Microsoft Graph API.
 
----
+---<img width="1360" height="679" alt="dashboard_redacted" src="https://github.com/user-attachments/assets/f1d6675e-34fb-4f60-b48b-95995147e772" />
+
 
 ## Features
 
