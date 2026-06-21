@@ -194,24 +194,34 @@ app.MapGet("/api/dashboard/identity", async (
     var riskyUsers = await db.SecurityAlerts.AsNoTracking()
         .CountAsync(a => a.AlertType == "RiskyUser" && !a.IsResolved, ct);
 
-    // Guest accounts and admin activity from Graph (best-effort)
+    // Guest accounts and admin activity from Graph (best-effort, time-boxed).
+    // These are live Graph calls; under throttling they could otherwise stack
+    // up 15s retry backoffs and hang the whole request. Cap them so the page
+    // always returns the (fast) DB-backed data within a few seconds.
     int guestTotal = 0;
     object[] recentActivity = [];
     if (options.Value.IsConfigured())
     {
         var graph = services.GetRequiredService<GraphApiClient>();
-        try
-        {
-            var guests = await graph.GetCollectionAsync(
-                "/v1.0/users?$filter=userType eq 'Guest'&$select=id,displayName,userPrincipalName&$top=200", ct);
-            guestTotal = guests.Count;
-        }
-        catch { /* permission not granted – skip */ }
+        using var budget = CancellationTokenSource.CreateLinkedTokenSource(ct);
+        budget.CancelAfter(TimeSpan.FromSeconds(10));
+        var gct = budget.Token;
 
         try
         {
-            var audits = await graph.GetCollectionAsync(
-                "/v1.0/auditLogs/directoryAudits?$top=10&$orderby=activityDateTime desc", ct);
+            var guests = await graph.GetCollectionAsync(
+                "/v1.0/users?$filter=userType eq 'Guest'&$select=id,displayName,userPrincipalName&$top=200", gct);
+            guestTotal = guests.Count;
+        }
+        catch { /* permission not granted, or budget elapsed – skip */ }
+
+        try
+        {
+            // Single page only — we want the latest 10, not the entire audit
+            // history. GetCollectionAsync would follow @odata.nextLink through
+            // every page (thousands of records).
+            var audits = await graph.GetSinglePageAsync(
+                "/v1.0/auditLogs/directoryAudits?$top=10&$orderby=activityDateTime desc", gct);
             recentActivity = audits.Select(a => (object)new
             {
                 activityDateTime = a.TryGetProperty("activityDateTime", out var dt) ? dt.GetString() : null,
@@ -222,7 +232,7 @@ app.MapGet("/api/dashboard/identity", async (
                 result = a.TryGetProperty("result", out var r) ? r.GetString() : null
             }).ToArray();
         }
-        catch { /* permission not granted – skip */ }
+        catch { /* permission not granted, or budget elapsed – skip */ }
     }
 
     return Results.Ok(new
@@ -470,7 +480,9 @@ app.MapGet("/api/dashboard/signin-locations", async (
     try
     {
         var graph = services.GetRequiredService<GraphApiClient>();
-        var signIns = await graph.GetCollectionAsync(
+        // Single page only — the latest 100 sign-ins for the location map.
+        // GetCollectionAsync would paginate through the entire sign-in history.
+        var signIns = await graph.GetSinglePageAsync(
             "/v1.0/auditLogs/signIns?$top=100&$select=location,userPrincipalName,createdDateTime,status,appDisplayName&$orderby=createdDateTime desc", ct);
         var result = signIns.Select(s =>
         {

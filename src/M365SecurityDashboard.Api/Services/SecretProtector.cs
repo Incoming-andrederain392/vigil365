@@ -19,7 +19,7 @@ public sealed class SecretProtector(ILogger<SecretProtector> logger)
     {
         if (string.IsNullOrEmpty(plaintext)) return plaintext;
         if (plaintext.StartsWith(Prefix, StringComparison.Ordinal)) return plaintext; // already protected
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return plaintext;
+        if (!OperatingSystem.IsWindows()) return plaintext;
 
         try
         {
@@ -38,6 +38,7 @@ public sealed class SecretProtector(ILogger<SecretProtector> logger)
     {
         if (string.IsNullOrEmpty(stored)) return stored;
         if (!stored.StartsWith(Prefix, StringComparison.Ordinal)) return stored; // legacy plaintext — return as-is
+        if (!OperatingSystem.IsWindows()) return null; // can't decrypt off Windows
 
         try
         {
