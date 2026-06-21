@@ -4317,16 +4317,18 @@ function App() {
     return () => { cancelled = true; };
   }, [loading, refreshKey, refreshAlertCenter]);
 
-  // 15-minute auto-refresh + countdown ticker
+  // Countdown ticker — pure decrement only (no side effects in the updater).
   useEffect(() => {
-    const ticker = setInterval(() => {
-      setCountdown(prev => {
-        if (prev <= 1) { setRefreshKey(k => k + 1); return AUTO_REFRESH_SEC; }
-        return prev - 1;
-      });
-    }, 1000);
+    const ticker = setInterval(() => setCountdown(prev => Math.max(0, prev - 1)), 1000);
     return () => clearInterval(ticker);
   }, []);
+
+  // When the countdown reaches zero, trigger a refresh. Kept separate from the
+  // ticker so the state updater stays pure and the refresh fires reliably.
+  // load() resets the countdown to AUTO_REFRESH_SEC on completion.
+  useEffect(() => {
+    if (countdown === 0 && !loading) setRefreshKey(k => k + 1);
+  }, [countdown, loading]);
 
   const newTriggeredCount = useMemo(() => triggeredAlerts.filter(a => a.status === "new").length, [triggeredAlerts]);
 
