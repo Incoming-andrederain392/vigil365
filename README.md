@@ -122,7 +122,7 @@ dotnet user-secrets set "Graph:ClientSecret" "YOUR_CLIENT_SECRET"
 ```powershell
 # Option A: let the API auto-create on first run (requires db-create rights)
 # Option B: pre-create manually
-sqlcmd -S .\SQLEXPRESS -E -i .\database\schema.sql
+sqlcmd -S .\SQLEXPRESS -E -I -i .\database\schema.sql
 ```
 
 ### 3. Build the frontend

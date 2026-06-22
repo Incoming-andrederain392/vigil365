@@ -1,3 +1,6 @@
+SET QUOTED_IDENTIFIER ON;
+GO
+
 IF DB_ID(N'M365SecurityDashboard') IS NULL
 BEGIN
     CREATE DATABASE M365SecurityDashboard;
